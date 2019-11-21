@@ -1,0 +1,94 @@
+---
+title: "Week 1 Assingment"
+author: "Pratistha Khadga"
+date: "September 5, 2019"
+output: 
+word_document: default
+html: default
+---
+```
+#PRATISTHA KHADGA
+
+# Assignment 1 using knn to determine the species of a new iris
+
+## To make sure all the required packages are installed I have again installed the required packages 
+```
+```{r}
+install.packages("rmarkdown")
+install.packages("ggplot2")
+install.packages("DescTools")
+```
+## To make uses of the required packages we use the library command to bring forth all the packages
+```{r}
+library(ggplot2)
+library(class)
+library(DescTools)
+```
+## The assignment requires only the uses of Peatal Length and Petal Width and Speices of the iris flowers 
+## Therefore we create a new data with only the required parameters
+```{r}
+dfiris4 <- data.frame(iris$Petal.Length, iris$Petal.Width, iris$Species)
+```
+##Then we assign names to the required parameters
+```{r}
+names(dfiris4) <- c("Length", "Width", "Species")
+```
+## The next step is to explore the data (making sure the derived data is what is required)
+```{r}
+dfiris4
+```
+## To get visual representation of the data we have derived a scatter plot of the data  
+```{r}
+ggplot(dfiris4, aes(x = Length, y = Width, col = Species)) + geom_point()
+```
+## Now to begin with the assignment using knn 
+
+## we assign a value to k variable
+```{r}
+myK <- 3
+```
+## As a test we give new length and width to a new iris flower
+```{r}
+myiris <- data.frame("Length"=2.25, "Width"=0.75)
+```
+## Checking the new iris parameters
+```{r}
+myiris
+```
+## TO check which type of 'species' the new flower is most similar to we create a function measuring its distance from other's already exsisting in the data data  
+```{r}
+euclDist <-function(x,y){
+  return(
+    sqrt((x-myiris$Length)^2 +(y-myiris$Width)^2))
+}
+```
+## we test this function putting in the values provided for the assignment
+```{r}
+euclDist(2,1)
+
+euclDist(2.25,0.75)
+```
+
+## we create a new colum dist measuring distance, using every lenght and width provided in the data
+## this is done by the use of mapply
+```{r}
+dfiris4$Dist <- mapply(euclDist, x = dfiris4$Length, y = dfiris4$Width)
+```
+##To enable the use of the variables in our data frame without having to call them we use the attach function
+```{r}
+
+attach(dfiris4); dfiris4 <- dfiris4[order(Dist),];
+
+##To enable the use of the Desctool package to perform the  next step we use the detach function
+
+detach(dfiris4)
+```
+## To see the top 3 rows of the data table with the new coloum we use the following step
+```{r}
+head(dfiris4, n= myK)
+```
+##The final output and conclusion determining the species of the new 
+```{r}
+paste ('The new Iris is classified as belonging to the' , DescTools::Mode(dfiris4[1:myK, 3]),
+       'species.' )
+```
